@@ -2,7 +2,12 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field, computed_field
 
 class Settings(BaseSettings):
-
+    # Load variables from a .env file automatically
+    model_config = SettingsConfigDict(
+        env_file=".env", 
+        env_file_encoding="utf-8",
+        case_sensitive=True
+    )
 
     # APP CONFIG
     APP_NAME: str = "CHAT APP"

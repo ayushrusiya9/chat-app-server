@@ -1,23 +1,29 @@
-from pydantic_settings import BaseSettings
-import os
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import Field, computed_field
 
 class Settings(BaseSettings):
-    # APP DESCRIPTION
-    APP_NAME = "CHAT APP"
-    APP_DESCRIPTION = "A simple chat application"
+
+
+    # APP CONFIG
+    APP_NAME: str = "CHAT APP"
+    APP_DESCRIPTION: str = "A simple chat application"
 
     # DATABASE CONFIG
-    DB_HOST = os.getenv("DB_HOST")
-    DB_PORT = os.getenv("DB_PORT")
-    DB_PASSWORD = os.getenv("DB_PASSWORD")
-    DB_NAME = os.getenv("DB_NAME")
-    DB_USER = os.getenv("DB_USER")
+    # Using Field(..., ...) makes these required. The app won't start if they are missing.
+    DB_HOST: str
+    DB_PORT: int = 5432
+    DB_USER: str
+    DB_PASSWORD: str
+    DB_NAME: str
 
-    # jwt config
-    SECRET_KEY= os.getenv("SECRET_KEY")
-    ALGORITHM = os.getenv("ALGORITHM")
-    ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
+    # JWT CONFIG
+    SECRET_KEY: str
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
+    @property
+    def DATABASE_URL(self) -> str:
+        """Assembles the database connection string."""
+        return f"postgresql://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
 settings = Settings()
-
